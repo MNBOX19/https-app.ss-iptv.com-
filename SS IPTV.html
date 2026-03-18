@@ -181,8 +181,8 @@
         <div class="form-group select-wrapper">
             <label>Formato da Lista de Saída</label>
             <select id="format" class="inp">
-                <option value="m3u8">HLS (.m3u8) - Ideal para Smart TV / Web</option>
-                <option value="ts">MPEG-TS (.ts) - Tradicional</option>
+                <option value="ts">MPEG-TS (.ts) - Padrão Smart TVs (Recomendado)</option>
+                <option value="m3u8">HLS (.m3u8) - Ideal para Web / Apps Mobile</option>
             </select>
         </div>
         
@@ -270,7 +270,6 @@
             }
         },
 
-        // FUNÇÕES DA BUSCA INTELIGENTE
         loadSmartDatabase: async () => {
             if(!App.extractCredentials()) return;
             const { server, user, pass } = App.config;
@@ -339,7 +338,6 @@
             element.classList.add('selected');
         },
 
-        // EXTRAÇÃO DE DADOS INICIAIS
         extractCredentials: () => {
             const method = document.getElementById('loginMethod').value;
             if (method === 'credentials') {
@@ -373,7 +371,6 @@
             App.showToast(msg, "error");
         },
 
-        // MOTOR PRINCIPAL
         start: async () => {
             if(!App.extractCredentials()) return;
             
@@ -399,7 +396,6 @@
                     App.config.expDateStr = "Ilimitado";
                 }
 
-                // Roteador de funções
                 if (['live', 'movie'].includes(App.config.type)) await App.generateCategoryBased();
                 else if (App.config.type === 'movie_smart') await App.generateSingleMovie();
                 else if (App.config.type === 'series_smart') await App.generateSingleSeries();
@@ -408,7 +404,6 @@
             } catch (err) { App.handleError("Erro na comunicação com o servidor."); }
         },
 
-        // GERA TV OU FILMES COMPLETOS
         generateCategoryBased: async () => {
             const { server, user, pass, format, type } = App.config;
             const isLive = type === 'live';
@@ -446,7 +441,6 @@
             App.finishProcess(m3u, streams.length, isLive ? "Canais" : "Filmes", baseName);
         },
 
-        // GERA FILME ÚNICO
         generateSingleMovie: async () => {
             const id = document.getElementById('selectedMediaId').value;
             if(!id) return App.handleError("Selecione um filme na lista primeiro!");
@@ -464,7 +458,6 @@
             App.finishProcess(m3u, 1, "Filme", baseName);
         },
 
-        // GERA SÉRIE ÚNICA
         generateSingleSeries: async () => {
             const id = document.getElementById('selectedMediaId').value;
             if(!id) return App.handleError("Selecione uma série na lista primeiro!");
@@ -496,7 +489,6 @@
             App.finishProcess(m3u, count, "Episódios", baseName);
         },
 
-        // GERA TUDO JUNTO (AVISO: PESADO)
         generateFullDatabase: async () => {
             const { server, user, pass, format } = App.config;
             App.updateStatus("Baixando base master (Isso é muito pesado!)...");
