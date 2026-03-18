@@ -338,7 +338,7 @@
             return 0;
         },
 
-        // NOVA FUNÇÃO: Checar Conta e Contar Mídias
+        // FUNÇÃO ATUALIZADA: Checar Conta e Contar APENAS Canais Ao Vivo (Muito mais rápido!)
         checkAccount: async () => {
             if(!App.extractCredentials()) return;
             
@@ -347,6 +347,7 @@
             document.getElementById('scannerResult').style.display = 'none';
 
             try {
+                // Puxa as informações da conta
                 const authUrl = `${App.config.server}/player_api.php?username=${App.config.user}&password=${App.config.pass}`;
                 const data = await App.fetchData(authUrl);
 
@@ -355,18 +356,9 @@
                     return App.showToast("Login inválido ou erro de servidor.", "error");
                 }
 
-                App.updateStatus("Contando mídias (Pode levar alguns segundos)...");
-                
-                // Baixa as 3 listas simultaneamente de forma otimizada
-                const [liveData, vodData, seriesData] = await Promise.all([
-                    App.fetchData(`${App.config.server}/player_api.php?username=${App.config.user}&password=${App.config.pass}&action=get_live_streams`),
-                    App.fetchData(`${App.config.server}/player_api.php?username=${App.config.user}&password=${App.config.pass}&action=get_vod_streams`),
-                    App.fetchData(`${App.config.server}/player_api.php?username=${App.config.user}&password=${App.config.pass}&action=get_series`)
-                ]);
-
+                // Puxa apenas a lista de canais ao vivo (ignora VOD e Series para ficar rápido)
+                const liveData = await App.fetchData(`${App.config.server}/player_api.php?username=${App.config.user}&password=${App.config.pass}&action=get_live_streams`);
                 const liveCount = App.getCount(liveData);
-                const vodCount = App.getCount(vodData);
-                const seriesCount = App.getCount(seriesData);
 
                 document.getElementById('statusContainer').style.display = 'none';
 
@@ -388,9 +380,10 @@
                 let maxCons = ui.max_connections === "0" || ui.max_connections === null ? "ILIMITADO" : ui.max_connections;
                 let activeCons = ui.active_cons || "0";
 
+                // Layout atualizado com 5 informações
                 const htmlStr = `
                     <div class="scan-item">
-                        <span>Status</span>
+                        <span>Status da Conta</span>
                         <strong class="${statusClass}">${statusText}</strong>
                     </div>
                     <div class="scan-item">
@@ -398,24 +391,16 @@
                         <strong>${expStr}</strong>
                     </div>
                     <div class="scan-item">
-                        <span>Telas Totais</span>
+                        <span>Limite de Telas</span>
                         <strong>${maxCons}</strong>
                     </div>
                     <div class="scan-item">
                         <span>Telas Em Uso</span>
                         <strong>${activeCons}</strong>
                     </div>
-                    <div class="scan-item" style="border: 1px solid rgba(255,255,255,0.05);">
-                        <span><i class="fas fa-tv" style="color:var(--info);"></i> Canais</span>
-                        <strong style="font-size: 15px;">${liveCount}</strong>
-                    </div>
-                    <div class="scan-item" style="border: 1px solid rgba(255,255,255,0.05);">
-                        <span><i class="fas fa-film" style="color:var(--info);"></i> Filmes</span>
-                        <strong style="font-size: 15px;">${vodCount}</strong>
-                    </div>
-                    <div class="scan-item" style="grid-column: span 2; border: 1px solid rgba(255,255,255,0.05);">
-                        <span><i class="fas fa-play-circle" style="color:var(--info);"></i> Séries Disponíveis</span>
-                        <strong style="font-size: 15px;">${seriesCount}</strong>
+                    <div class="scan-item" style="grid-column: span 2; border: 1px solid rgba(255,255,255,0.05); padding: 15px;">
+                        <span><i class="fas fa-tv" style="color:var(--info);"></i> Total de Canais Ao Vivo</span>
+                        <strong style="font-size: 16px;">${liveCount}</strong>
                     </div>
                 `;
 
