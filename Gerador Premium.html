@@ -479,9 +479,10 @@
                     const eNum = parseInt(ep.episode_num || (i+1)).toString().padStart(2, '0');
                     const url = `${server}/series/${user}/${pass}/${ep.id}.${ep.container_extension || "mp4"}`;
                     
-                    // NOVA FORMATAÇÃO DE EPISÓDIO
-                    const epTitle = `${name} - Temporada ${sNum} - Episódio ${eNum}`;
+                    // NOVA FORMATAÇÃO LIMPA: Apenas Temporada e Episódio
+                    const epTitle = `Temporada ${sNum} - Episódio ${eNum}`;
                     
+                    // O group-title="${name}" garante que fique na pasta correta com o nome da série
                     m3u += `#EXTINF:-1 tvg-id="" tvg-name="${epTitle}" tvg-logo="${cover}" group-title="${name}",${epTitle}\n${url}\n`;
                     count++;
                 });
